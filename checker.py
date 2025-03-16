@@ -1,7 +1,7 @@
-from selenium import webdriver # управление браузером
-from selenium.webdriver.common.by import By # поиск элементов HTML 
-from selenium.webdriver.common.keys import Keys # Работа с клавишами клавиатуры
-import time # для паузы в действиях
+from selenium import webdriver  # управление браузером
+from selenium.webdriver.common.by import By  # поиск элементов HTML 
+from selenium.webdriver.common.keys import Keys  # работа с клавишами клавиатуры
+import time  # для паузы в действиях
 
 # Данные для входа
 login = "Check_account"
@@ -9,14 +9,14 @@ password = "Yoghurt8"
 
 # Настройки браузера
 options = webdriver.ChromeOptions()
-options.add_argument("--headless")  # Закомментировать, если нужен видимый браузер
+#options.add_argument("--headless")  # Закомментировать, если нужен видимый браузер
 
-driver = webdriver.Chrome(options=options)  # настройка браузера с заданными настройками
+driver = webdriver.Chrome(options=options)  # инициализация браузера с заданными настройками
 
 try:
     # Открываем сайт
     driver.get("https://loliland.net/start")
-    time.sleep(2)  # Ждем загрузки страницы
+    time.sleep(5)  # Ждем загрузки страницы
 
     # Находим поле логина (по placeholder)
     login_field = driver.find_element(By.XPATH, "//input[@placeholder='Логин']")
@@ -32,11 +32,12 @@ try:
 
     time.sleep(3)  # Ждем входа
 
-    # Проверяем, залогинились ли (например, проверяем наличие личного кабинета)
-    if "dashboard" in driver.current_url or "profile" in driver.page_source:
-        print("✅ Успешный вход!")
-    else:
-        print("❌ Ошибка входа, проверьте логин и пароль")
+    # Проверяем успешный вход по наличию элемента с классом 'profile_div'
+    try:
+        profile_div = driver.find_element(By.CLASS_NAME, "profile_div")
+        print(f"✅ Успешный вход! {login}:{password}")
+    except:
+        print(f"❌ Ошибка входа! {login}:{password}")
 
 finally:
     driver.quit()  # Закрываем браузер
