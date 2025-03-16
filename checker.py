@@ -4,24 +4,19 @@ from selenium.webdriver.common.by import By  # поиск элементов HTM
 from selenium.webdriver.support import expected_conditions as EC  # ожидаемые условия
 from selenium.webdriver.support.ui import WebDriverWait  # ожидания
 import time  # для паузы в действиях
+from fake_useragent import UserAgent
 
 
-# Список различных пользовательских агентов
-user_agents = [
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101 Firefox/78.0",
-    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.3 Safari/605.1.15",
-    "Mozilla/5.0 (Linux; Android 10; Pixel 3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Mobile Safari/537.36",
-    "Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/604.1"
-]
+# Создаем экземпляр UserAgent
+ua = UserAgent()
 
-# Выбор случайного пользовательского агента
-random_user_agent = random.choice(user_agents)
+# Генерируем случайный пользовательский агент
+random_user_agent = ua.random
 
 # Настройки браузера
 options = webdriver.ChromeOptions()
 options.add_argument(f"user-agent={random_user_agent}")  # Устанавливаем случайный пользовательский агент
-options.add_argument("--headless")  # Закомментировать, если нужен видимый браузер
+#options.add_argument("--headless")  # Закомментировать, если нужен видимый браузер
 
 driver = webdriver.Chrome(options=options)  # инициализация браузера с заданными настройками
 
