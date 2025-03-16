@@ -18,7 +18,14 @@ options = webdriver.ChromeOptions()
 options.add_argument(f"user-agent={random_user_agent}")  # Устанавливаем случайный пользовательский агент
 #options.add_argument("--headless")  # Закомментировать, если нужен видимый браузер
 
+# для меньшего шанса обнаружения
+options.add_argument("--disable-gpu")
+options.add_argument("--no-sandbox")
+options.add_argument("--disable-dev-shm-usage")
+options.add_argument("--remote-debugging-port=9222")
+
 driver = webdriver.Chrome(options=options)  # инициализация браузера с заданными настройками
+driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
 
 # Файлы для входа и результатов
 input_file = "accounts_check.txt"

@@ -3,4 +3,4 @@
 3. Создание виртуального окружения 
 `python -m venv venv`
 4. Установка 
-`pip install requests beautifulsoup4`
+`pip beautifulsoup4 fake-useragent`
