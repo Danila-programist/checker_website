@@ -1,3 +1,5 @@
 venv
 checker_1/results.txt
 checker_1/money_results.txt
+checker_2/invalid.txt
+checker_2/valid.txt

@@ -4,6 +4,9 @@ import time
 from fake_useragent import UserAgent
 from selenium.webdriver.common.action_chains import ActionChains
 import random  # для генерации случайных чисел
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
+
 
 # Создаем экземпляр UserAgent
 ua = UserAgent()
@@ -56,7 +59,7 @@ try:
         nickname = account.strip()
         print(f'🔄 Проверка аккаунта {nickname}')
         input_nick = driver.find_element(By.ID, 'input_nick')
-
+        flag_1 = flag_2 = True
         input_nick.click()
         input_nick.clear()
         input_nick.send_keys(nickname)
@@ -70,12 +73,13 @@ try:
             # Проверка на "Аккаунт не найден!"
             error_message = driver.find_element(By.XPATH, "//div[@class='swal2-html-container' and contains(text(), 'Аккаунт не найден!')]")
             if error_message.is_displayed():
-                with open(invalid_file, "w") as file:
+                with open(invalid_file, "a") as file:
                     file.write(f"{nickname}: Аккаунт не найден!\n")
                 print(f"❌ Ошибка: {nickname} не найден!")
                 ok_button = driver.find_element(By.CSS_SELECTOR, '.swal2-confirm')
                 ok_button.click()
                 time.sleep(random.randint(1, 3)) 
+                flag_1 = False
         except:
             pass
 
@@ -83,23 +87,23 @@ try:
             # Проверка на "У вас уже стоит данная привилегия!"
             error_message = driver.find_element(By.XPATH, "//div[@class='swal2-html-container' and contains(text(), 'У вас уже стоит данная привилегия!')]")
             if error_message.is_displayed():
-                with open(invalid_file, "w") as file:
+                with open(invalid_file, "a") as file:
                     file.write(f"{nickname}: Уже имеет привилегию\n")
                 print(f"⚠️ Привилегия уже активна для {nickname}")
                 ok_button = driver.find_element(By.CSS_SELECTOR, 'button.swal2-confirm')
                 ok_button.click()
                 time.sleep(random.randint(1, 3)) 
+                flag_2 = False
         except:
             pass
 
-        try:
-            # Заполнение формы покупки 
-            buy_form = driver.find_element(By.ID, "buy_form")
-            if buy_form.is_displayed():
-                print(f"✔️ {nickname} успешно прошел проверку и доступна покупка!")
-                time.sleep(random.randint(1, 3))
-        except:
-            pass
+
+        if flag_1 and flag_2:
+            print(f"✔️ {nickname} успешно прошел проверку и доступна покупка!")
+            with open(valid_file, "a") as file:
+                    file.write(f"{nickname}: успешно прошел проверку и доступна покупка!\n")
+       
+    
 
 finally:
     driver.quit()
