@@ -17,7 +17,7 @@ random_user_agent = ua.random
 # Настройки браузера
 options = webdriver.ChromeOptions()
 options.add_argument(f"user-agent={random_user_agent}")  # Устанавливаем случайный пользовательский агент
-options.add_argument("--headless")  # Закомментировать, если нужен видимый браузер
+# options.add_argument("--headless")  # Закомментировать, если нужен видимый браузер
 # для меньшего шанса обнаружения
 options.add_argument("--disable-gpu")
 options.add_argument("--no-sandbox")
