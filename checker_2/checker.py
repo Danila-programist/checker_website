@@ -22,11 +22,11 @@ options.add_argument("--disable-dev-shm-usage")
 options.add_argument("--remote-debugging-port=9222")
 #options.add_argument('--proxy-server=IP:PORT') использование прокси
 
-# инициализация браузера с заданными настройками
+# Инициализация браузера с заданными настройками
 driver = webdriver.Chrome(options=options)  
 driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})") # 
 
-# эмуляция движения мышки
+# Эмуляция движения мышки
 action = ActionChains(driver)
 action.move_by_offset(random.randint(100, 400), random.randint(100, 400)).perform()
 
@@ -41,34 +41,65 @@ try:
     with open(input_file, "r") as file:
         accounts = file.readlines()
 
-    # заходим на сайт
+    # Заходим на сайт
     driver.get("https://funtime.su/")
-    time.sleep(random.randint(5, 10))  
+    time.sleep(random.randint(3, 5))  
 
     button = driver.find_element(By.XPATH, "//div[@id='method_select']/p[text()='Навсегда']")
     button.click()
-    time.sleep(random.randint(3, 5))
+    time.sleep(random.randint(1, 3))
     buy_button = driver.find_element(By.ID, 'buy_button')
     buy_button.click()
-    time.sleep(random.randint(3, 5))
+    time.sleep(random.randint(1, 3))
 
     for account in accounts:
-        
         nickname = account.strip()
-
+        print(f'🔄 Проверка аккаунта {nickname}')
         input_nick = driver.find_element(By.ID, 'input_nick')
 
         input_nick.click()
         input_nick.clear()
         input_nick.send_keys(nickname)
-        time.sleep(random.randint(3, 5))
+        time.sleep(random.randint(1, 3))
         button = driver.find_element(By.CSS_SELECTOR, '[data-ind="method_button"]')
         button.click()
-        time.sleep(random.randint(3, 5))
+        time.sleep(random.randint(1, 3))
 
-        print(f'🔄 Проверка аккаунта {nickname}')
+        # Обработка всплывающих окон
+        try:
+            # Проверка на "Аккаунт не найден!"
+            error_message = driver.find_element(By.XPATH, "//div[@class='swal2-html-container' and contains(text(), 'Аккаунт не найден!')]")
+            if error_message.is_displayed():
+                with open(invalid_file, "w") as file:
+                    file.write(f"{nickname}: Аккаунт не найден!\n")
+                print(f"❌ Ошибка: {nickname} не найден!")
+                ok_button = driver.find_element(By.CSS_SELECTOR, '.swal2-confirm')
+                ok_button.click()
+                time.sleep(random.randint(1, 3)) 
+        except:
+            pass
 
+        try:
+            # Проверка на "У вас уже стоит данная привилегия!"
+            error_message = driver.find_element(By.XPATH, "//div[@class='swal2-html-container' and contains(text(), 'У вас уже стоит данная привилегия!')]")
+            if error_message.is_displayed():
+                with open(invalid_file, "w") as file:
+                    file.write(f"{nickname}: Уже имеет привилегию\n")
+                print(f"⚠️ Привилегия уже активна для {nickname}")
+                ok_button = driver.find_element(By.CSS_SELECTOR, 'button.swal2-confirm')
+                ok_button.click()
+                time.sleep(random.randint(1, 3)) 
+        except:
+            pass
 
+        try:
+            # Заполнение формы покупки 
+            buy_form = driver.find_element(By.ID, "buy_form")
+            if buy_form.is_displayed():
+                print(f"✔️ {nickname} успешно прошел проверку и доступна покупка!")
+                time.sleep(random.randint(1, 3))
+        except:
+            pass
 
 finally:
     driver.quit()
